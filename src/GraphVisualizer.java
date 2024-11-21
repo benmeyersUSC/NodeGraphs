@@ -194,7 +194,7 @@ public class GraphVisualizer {
         // Example usage
         NodeGraph graph = new NodeGraph();
         graph.ogNodeGraph();
-        saveGraphImage(graph, "graph.png", true);
+        saveGraphImage(graph, "goodLookingGraph.png", true);
     }
 }
 
