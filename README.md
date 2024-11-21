@@ -1,1 +1,1 @@
-![An example image](images/example.png)
+![NodeGraph](goodLookingGraph.png)
