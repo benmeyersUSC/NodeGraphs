@@ -1,3 +1,5 @@
+import org.w3c.dom.Node;
+
 import java.util.*;
 
 //public class NodeGraph {
@@ -97,7 +99,6 @@ import java.util.*;
 ////        graph.addEdge(graph.getStart(), y);
 //
 //
-//        System.out.println(graph);
 //    }
 //}
 
@@ -107,15 +108,20 @@ public class NodeGraph {
     private final GNode end;
     private Set<GNode> nodes;
     private Map<GNode, Map<GNode, Double>> adjacencyMap;
+    private Set<GNode> dijkstraNodes;
 
-    public NodeGraph() {
-        this.start = new GNode(99, 99, "Start");
+    public NodeGraph(double strtX, double strtY) {
+        this.start = new GNode(strtX, strtY, "Start");
         this.end = new GNode(0, 0, "End");
         this.nodes = new HashSet<>();
         this.adjacencyMap = new HashMap<>();
 
         addNode(start);
         addNode(end);
+    }
+
+    public NodeGraph(){
+        this(99, 99);
     }
 
     public GNode getStart() {
@@ -159,6 +165,8 @@ public class NodeGraph {
         return nodes;
     }
 
+    public Set<GNode> getDijkstraNodes(){return dijkstraNodes;}
+
     public String toString() {
         StringBuilder s = new StringBuilder();
         for (GNode n : nodes) {
@@ -167,8 +175,58 @@ public class NodeGraph {
         return s.toString();
     }
 
+    public void ogNodeGraph(){
 
-    public Map<String, Object> dijkstra_route(){
+
+        GNode a = new GNode(-25, 44, "A");
+        GNode b = new GNode(-1, 55, "B");
+        GNode c = new GNode(15, 30, "C");
+        GNode d = new GNode(-10, 20, "D");
+
+        GNode ben = new GNode(27, 27, "Z");
+        this.addNode(ben);
+        this.addEdge(b, ben);
+        this.addEdge(ben, this.getEnd());
+
+        GNode xx = new GNode(81, 81, "XX");
+        this.addNode(xx);
+        this.addEdge(this.getStart(), xx);
+
+        GNode zz = new GNode(63, 54, "zz");
+        this.addNode(zz);
+        this.addEdge(xx, zz);
+        this.addEdge(zz, b);
+
+        GNode cc = new GNode(72, 33, "cc");
+        this.addNode(cc);
+        this.addEdge(cc, zz);
+        this.addEdge(cc, ben);
+
+        GNode dd = new GNode(45, 18, "dd");
+        this.addNode(dd);
+        this.addEdge(dd, this.getEnd());
+
+        GNode rr = new GNode(54, 9, "rr");
+        this.addNode(rr);
+        this.addEdge(rr, cc);
+        this.addEdge(rr, dd);
+        this.addEdge(rr, a);
+
+
+        this.addNode(a);
+        this.addNode(b);
+        this.addNode(c);
+        this.addNode(d);
+
+        this.addEdge(this.getStart(), b);
+        this.addEdge(a, b);
+        this.addEdge(b, c);
+        this.addEdge(c, d);
+        this.addEdge(d, this.getEnd());
+    }
+
+    public Map<String, Object> dijkstraRoute(){
+
         // "route": List<Node>, "distance": double
         Map<String, Object> route = new HashMap<>();
         // queue of nodes to be visited
@@ -193,7 +251,6 @@ public class NodeGraph {
 
         // take the top Node (should be start to start)
         DijkstraQueueNode top = queue.poll();
-        System.out.println(top.node);
         while (!top.node.equals(end)){ // until we see the end
             for (GNode nd: getNeighbors(top.node)){
                 DijkstraQueueNode neighb = addrs.get(nd);
@@ -208,72 +265,196 @@ public class NodeGraph {
             top = queue.poll();
         }
 
+        dijkstraNodes = new HashSet<>();
         List<GNode> rt = new ArrayList<>();
         GNode cur = end;
         double dst = 0.0;
         while (!cur.equals(start)){
+            dijkstraNodes.add(cur);
             rt.add(cur);
             dst += adjacencyMap.get(cur).get(addrs.get(cur).from);
             cur = addrs.get(cur).from;
         }
         rt.add(start);
+        dijkstraNodes.add(start);
 
         route.put("route", rt.reversed());
         route.put("distance", dst);
         return route;
     }
 
+//    public static NodeGraph randomNodeGraph(int numNodes) {
+//        Random r = new Random();
+//        NodeGraph graph = new NodeGraph(100, 100);
+//
+//        // Get the start and end nodes from the graph
+//        GNode startNode = graph.getStart();
+//        GNode endNode = graph.getEnd();
+//
+//        // Ensure at least 2 nodes if input is too low
+//        if (numNodes < 2) {
+//            numNodes = 2;
+//        }
+//
+//        // Create a list to keep track of nodes as we add them
+//        List<GNode> addedNodes = new ArrayList<>();
+//        int connectedToStart = 0;
+//        int connectedToEnd = 0;
+//
+//        for (int i = 0; i < numNodes; i++) {
+//            // Generate random coordinates and ID
+//            double x = r.nextDouble() * 100;
+//            double y = r.nextDouble() * 100;
+//            String id = UUID.randomUUID().toString(); // More unique ID generation
+//
+//            // Create the node
+//            GNode currentNode = new GNode(x, y, id);
+//            graph.addNode(currentNode);
+//            addedNodes.add(currentNode);
+//
+//            // Ensure at least two nodes connect to start
+//            if (startNode != null && connectedToStart < 2) {
+//                graph.addEdge(currentNode, startNode);
+//                connectedToStart++;
+//            }
+//
+//            // Ensure at least two nodes connect to end
+//            if (endNode != null && connectedToEnd < 2) {
+//                graph.addEdge(currentNode, endNode);
+//                connectedToEnd++;
+//            }
+//
+//            // Connect to previous nodes
+//            if (addedNodes.size() > 1) {
+//                // Connect to 1-3 previous nodes to create some randomness in connections
+//                int connectionsToMake = Math.min(r.nextInt(3) + 1, addedNodes.size() - 1);
+//
+//                for (int j = 0; j < connectionsToMake; j++) {
+//                    // Ensure we don't connect to the same node twice
+//                    List<GNode> potentialConnections = new ArrayList<>(addedNodes.subList(0, addedNodes.size() - 1));
+//                    if (!potentialConnections.isEmpty()) {
+//                        // Randomly select a node to connect to
+//                        int connectionIndex = r.nextInt(potentialConnections.size());
+//                        GNode nodeToConnectTo = potentialConnections.get(connectionIndex);
+//
+//                        // Add edge between current node and selected previous node
+//                        graph.addEdge(currentNode, nodeToConnectTo);
+//                    }
+//                }
+//
+//                // Additional random connections to start/end if not yet met
+//                if (startNode != null && connectedToStart < 2 && r.nextDouble() < 0.5) {
+//                    graph.addEdge(currentNode, startNode);
+//                    connectedToStart++;
+//                }
+//
+//                if (endNode != null && connectedToEnd < 2 && r.nextDouble() < 0.5) {
+//                    graph.addEdge(currentNode, endNode);
+//                    connectedToEnd++;
+//                }
+//            }
+//        }
+//
+//        return graph;
+//    }
+
+    public static NodeGraph randomNodeGraph(int numNodes) {
+        Random r = new Random();
+        final double MAX_X = 100;
+        final double MAX_Y = 100;
+        final double MIN_X = 50;
+        final double MIN_Y = 50;
+
+        NodeGraph graph = new NodeGraph(MAX_X, MAX_Y);
+        GNode startNode = graph.getStart();
+        GNode endNode = graph.getEnd();
+
+        if (numNodes < 15) numNodes = 15;
+        List<GNode> addedNodes = new ArrayList<>();
+        addedNodes.add(startNode);
+        addedNodes.add(endNode);
+
+        // Create edge nodes first
+        GNode topEdge = new GNode(75, MAX_Y - 5, "TopEdge");
+        GNode rightEdge = new GNode(MAX_X - 5, 75, "RightEdge");
+        GNode cornerEdge = new GNode(MAX_X - 10, MAX_Y - 10, "CornerEdge");
+
+        graph.addNode(topEdge);
+        graph.addNode(rightEdge);
+        graph.addNode(cornerEdge);
+
+        graph.addEdge(startNode, cornerEdge);
+        graph.addEdge(cornerEdge, topEdge);
+        graph.addEdge(cornerEdge, rightEdge);
+
+        addedNodes.addAll(Arrays.asList(topEdge, rightEdge, cornerEdge));
+
+        // Add nodes in different regions
+        while (addedNodes.size() < numNodes) {
+            GNode newNode;
+            double x, y;
+
+            // Choose a region pattern
+            switch (r.nextInt(4)) {
+                case 0: // Top edge region
+                    x = MIN_X + r.nextDouble() * (MAX_X - MIN_X);
+                    y = MAX_Y - r.nextDouble() * 15;
+                    break;
+                case 1: // Right edge region
+                    x = MAX_X - r.nextDouble() * 15;
+                    y = MIN_Y + r.nextDouble() * (MAX_Y - MIN_Y);
+                    break;
+                case 2: // Bottom region
+                    x = MIN_X + r.nextDouble() * (MAX_X - MIN_X);
+                    y = MIN_Y + r.nextDouble() * 15;
+                    break;
+                default: // Scattered away from y=x
+                    if (r.nextBoolean()) {
+                        x = MIN_X + r.nextDouble() * 20;
+                        y = MIN_Y + r.nextDouble() * (MAX_Y - MIN_Y);
+                    } else {
+                        x = MIN_X + r.nextDouble() * (MAX_X - MIN_X);
+                        y = MAX_Y - r.nextDouble() * 20;
+                    }
+            }
+
+            newNode = new GNode(x, y, "Node_" + addedNodes.size());
+            graph.addNode(newNode);
+
+            // Connect to 2-3 existing nodes
+            int connections = r.nextInt(2) + 2;
+            List<GNode> shuffledNodes = new ArrayList<>(addedNodes);
+            Collections.shuffle(shuffledNodes);
+
+            for (int i = 0; i < connections && i < shuffledNodes.size(); i++) {
+                graph.addEdge(newNode, shuffledNodes.get(i));
+            }
+
+            addedNodes.add(newNode);
+        }
+
+        // Add some strategic cross-connections
+        for (int i = 0; i < numNodes / 4; i++) {
+            GNode node1 = addedNodes.get(r.nextInt(addedNodes.size()));
+            GNode node2 = addedNodes.get(r.nextInt(addedNodes.size()));
+
+            if (!node1.equals(node2) &&
+                    !graph.getNeighbors(node1).contains(node2)) {
+                graph.addEdge(node1, node2);
+            }
+        }
+
+        return graph;
+    }
+
     public static void main(String[] args) {
+
+//        NodeGraph graph = NodeGraph.randomNodeGraph(10);
         NodeGraph graph = new NodeGraph();
-        GNode a = new GNode(-25, 44, "A");
-        GNode b = new GNode(-1, 55, "B");
-        GNode c = new GNode(15, 30, "C");
-        GNode d = new GNode(-10, 20, "D");
+        graph.ogNodeGraph();
 
-        GNode ben = new GNode(27, 27, "Z");
-        graph.addNode(ben);
-        graph.addEdge(b, ben);
-        graph.addEdge(ben, graph.getEnd());
+        GraphVisualizer.saveGraphImage(graph, "graph.png", true);
 
-        GNode xx = new GNode(81, 81, "XX");
-        graph.addNode(xx);
-        graph.addEdge(graph.getStart(), xx);
-
-        GNode zz = new GNode(63, 54, "zz");
-        graph.addNode(zz);
-        graph.addEdge(xx, zz);
-        graph.addEdge(zz, b);
-
-        GNode cc = new GNode(72, 33, "cc");
-        graph.addNode(cc);
-        graph.addEdge(cc, zz);
-        graph.addEdge(cc, ben);
-
-        GNode dd = new GNode(45, 18, "dd");
-        graph.addNode(dd);
-        graph.addEdge(dd, graph.getEnd());
-
-        GNode rr = new GNode(54, 9, "rr");
-        graph.addNode(rr);
-        graph.addEdge(rr, cc);
-        graph.addEdge(rr, dd);
-        graph.addEdge(rr, a);
-
-
-        graph.addNode(a);
-        graph.addNode(b);
-        graph.addNode(c);
-        graph.addNode(d);
-
-        graph.addEdge(graph.getStart(), b);
-        graph.addEdge(a, b);
-        graph.addEdge(b, c);
-        graph.addEdge(c, d);
-        graph.addEdge(d, graph.getEnd());
-
-        GraphVisualizer.saveGraphImage(graph, "graph.png");
-
-        System.out.println(graph.dijkstra_route());
 
     }
 
