@@ -271,7 +271,7 @@ public class NodeGraph {
         graph.addEdge(c, d);
         graph.addEdge(d, graph.getEnd());
 
-        GraphVisualizer.saveGraphImage(graph, "/Users/benmeyers/Desktop/Fun/A_Star/src/graph.png");
+        GraphVisualizer.saveGraphImage(graph, "graph.png");
 
         System.out.println(graph.dijkstra_route());
 
