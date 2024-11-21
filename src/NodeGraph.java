@@ -178,12 +178,15 @@ public class NodeGraph {
     public void ogNodeGraph(){
 
 
-        GNode a = new GNode(-25, 44, "A");
+        GNode a = new GNode(35, 63, "A");
         GNode b = new GNode(-1, 55, "B");
         GNode c = new GNode(15, 30, "C");
         GNode d = new GNode(-10, 20, "D");
+        GNode ff = new GNode(18, 90, "ff");
+        GNode tt = new GNode(54, 72, "tt");
+        GNode hh = new GNode(33, 81, "hh");
 
-        GNode ben = new GNode(27, 27, "Z");
+        GNode ben = new GNode(45, 45, "Z");
         this.addNode(ben);
         this.addEdge(b, ben);
         this.addEdge(ben, this.getEnd());
@@ -197,7 +200,7 @@ public class NodeGraph {
         this.addEdge(xx, zz);
         this.addEdge(zz, b);
 
-        GNode cc = new GNode(72, 33, "cc");
+        GNode cc = new GNode(99, 27, "cc");
         this.addNode(cc);
         this.addEdge(cc, zz);
         this.addEdge(cc, ben);
@@ -211,6 +214,8 @@ public class NodeGraph {
         this.addEdge(rr, cc);
         this.addEdge(rr, dd);
         this.addEdge(rr, a);
+        this.addEdge(ff, b);
+        this.addEdge(ff, start);
 
 
         this.addNode(a);
@@ -218,7 +223,11 @@ public class NodeGraph {
         this.addNode(c);
         this.addNode(d);
 
-        this.addEdge(this.getStart(), b);
+        this.addEdge(this.getStart(), hh);
+        this.addEdge(hh, a);
+
+        this.addEdge(this.getStart(), tt);
+        this.addEdge(tt, cc);
         this.addEdge(a, b);
         this.addEdge(b, c);
         this.addEdge(c, d);
@@ -282,81 +291,6 @@ public class NodeGraph {
         route.put("distance", dst);
         return route;
     }
-
-//    public static NodeGraph randomNodeGraph(int numNodes) {
-//        Random r = new Random();
-//        NodeGraph graph = new NodeGraph(100, 100);
-//
-//        // Get the start and end nodes from the graph
-//        GNode startNode = graph.getStart();
-//        GNode endNode = graph.getEnd();
-//
-//        // Ensure at least 2 nodes if input is too low
-//        if (numNodes < 2) {
-//            numNodes = 2;
-//        }
-//
-//        // Create a list to keep track of nodes as we add them
-//        List<GNode> addedNodes = new ArrayList<>();
-//        int connectedToStart = 0;
-//        int connectedToEnd = 0;
-//
-//        for (int i = 0; i < numNodes; i++) {
-//            // Generate random coordinates and ID
-//            double x = r.nextDouble() * 100;
-//            double y = r.nextDouble() * 100;
-//            String id = UUID.randomUUID().toString(); // More unique ID generation
-//
-//            // Create the node
-//            GNode currentNode = new GNode(x, y, id);
-//            graph.addNode(currentNode);
-//            addedNodes.add(currentNode);
-//
-//            // Ensure at least two nodes connect to start
-//            if (startNode != null && connectedToStart < 2) {
-//                graph.addEdge(currentNode, startNode);
-//                connectedToStart++;
-//            }
-//
-//            // Ensure at least two nodes connect to end
-//            if (endNode != null && connectedToEnd < 2) {
-//                graph.addEdge(currentNode, endNode);
-//                connectedToEnd++;
-//            }
-//
-//            // Connect to previous nodes
-//            if (addedNodes.size() > 1) {
-//                // Connect to 1-3 previous nodes to create some randomness in connections
-//                int connectionsToMake = Math.min(r.nextInt(3) + 1, addedNodes.size() - 1);
-//
-//                for (int j = 0; j < connectionsToMake; j++) {
-//                    // Ensure we don't connect to the same node twice
-//                    List<GNode> potentialConnections = new ArrayList<>(addedNodes.subList(0, addedNodes.size() - 1));
-//                    if (!potentialConnections.isEmpty()) {
-//                        // Randomly select a node to connect to
-//                        int connectionIndex = r.nextInt(potentialConnections.size());
-//                        GNode nodeToConnectTo = potentialConnections.get(connectionIndex);
-//
-//                        // Add edge between current node and selected previous node
-//                        graph.addEdge(currentNode, nodeToConnectTo);
-//                    }
-//                }
-//
-//                // Additional random connections to start/end if not yet met
-//                if (startNode != null && connectedToStart < 2 && r.nextDouble() < 0.5) {
-//                    graph.addEdge(currentNode, startNode);
-//                    connectedToStart++;
-//                }
-//
-//                if (endNode != null && connectedToEnd < 2 && r.nextDouble() < 0.5) {
-//                    graph.addEdge(currentNode, endNode);
-//                    connectedToEnd++;
-//                }
-//            }
-//        }
-//
-//        return graph;
-//    }
 
     public static NodeGraph randomNodeGraph(int numNodes) {
         Random r = new Random();
